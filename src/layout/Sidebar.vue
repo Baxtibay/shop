@@ -14,15 +14,27 @@
     ]"
   >
     <div class="h-12 flex items-center justify-between px-4 border-b">
-      <span v-if="!collapsed" class="font-semibold">
+      <span v-if="!collapsed || mobileOpen" class="font-semibold">
         Store
       </span>
 
       <button
-        class="text-gray-500 hover:text-gray-800 text-lg"
+        class="md:hidden text-gray-600 hover:text-gray-900"
+        @click="$emit('closeMobile')"
+      >
+        <i class="fa-solid fa-xmark text-2xl"></i>
+      </button>
+
+      <!-- 🔹 Desktop collapse -->
+      <button
+        class="hidden md:block text-gray-600 hover:text-gray-900"
         @click="$emit('toggle')"
       >
-        <i class="fa-solid fa-bars"></i>
+        <i
+          :class="collapsed
+            ? 'fa-solid fa-angles-right'
+            : 'fa-solid fa-angles-left'"
+        ></i>
       </button>
     </div>
 
@@ -47,6 +59,11 @@ import SidebarItem from './SidebarItem.vue'
 
 export default {
   props: ['collapsed', 'mobileOpen'],
-  components: { SidebarItem }
+  components: { SidebarItem },
+  methods: {
+    handleMobileToggle() {
+      this.mobileOpen = !this.mobileOpen
+    }
+  }
 }
 </script>
