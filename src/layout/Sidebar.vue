@@ -13,11 +13,13 @@
         : 'fixed top-0 left-0 h-full w-[80%] -translate-x-full z-50'
     ]"
   >
+    <!-- HEADER -->
     <div class="h-12 flex items-center justify-between px-4 border-b">
       <span v-if="!collapsed || mobileOpen" class="font-semibold">
         Store
       </span>
 
+      <!-- Mobile close -->
       <button
         class="md:hidden text-gray-600 hover:text-gray-900"
         @click="$emit('closeMobile')"
@@ -25,7 +27,7 @@
         <i class="fa-solid fa-xmark text-2xl"></i>
       </button>
 
-      <!-- 🔹 Desktop collapse -->
+      <!-- Desktop collapse -->
       <button
         class="hidden md:block text-gray-600 hover:text-gray-900"
         @click="$emit('toggle')"
@@ -38,32 +40,57 @@
       </button>
     </div>
 
+    <!-- NAVIGATION -->
     <nav class="p-2 space-y-1">
-      <SidebarItem icon="fa-house" label="Home" :collapsed="collapsed" to="/" />
-      <div class="flex items-center gap-3 px-3 py-2 text-gray-400 cursor-not-allowed">
-        <i class="fa-solid fa-store w-5"></i>
-        <span v-if="!collapsed">Shops</span>
-      </div>
 
-      <div class="flex items-center gap-3 px-3 py-2 text-gray-400 cursor-not-allowed">
-        <i class="fa-solid fa-calendar-days w-5"></i>
-        <span v-if="!collapsed">Monthly Plans</span>
+      <!-- Home -->
+      <SidebarItem
+        icon="fa-house"
+        label="Home"
+        :collapsed="collapsed"
+        to="/"
+      />
+
+      <!-- Shops main -->
+      <SidebarItem
+        icon="fa-store"
+        label="Shops"
+        :collapsed="collapsed"
+        to="/shops"
+      />
+
+      <!-- Nested shops -->
+      <div
+        v-if="shops.length && !collapsed"
+        class="ml-8 space-y-1"
+      >
+        <SidebarItem
+          v-for="shop in shops"
+          :key="shop.id"
+          icon="fa-circle"
+          :label="shop.title.rendered"
+          :collapsed="false"
+          :to="`/shop/${shop.id}`"
+          class="text-sm text-gray-600"
+        />
       </div>
 
     </nav>
   </aside>
 </template>
 
-<script>
+<script setup>
+import { onMounted, computed } from 'vue'
+import { useShopStore } from '@/stores/shopStore'
 import SidebarItem from './SidebarItem.vue'
 
-export default {
-  props: ['collapsed', 'mobileOpen'],
-  components: { SidebarItem },
-  methods: {
-    handleMobileToggle() {
-      this.mobileOpen = !this.mobileOpen
-    }
-  }
-}
+const props = defineProps(['collapsed', 'mobileOpen'])
+
+const shopStore = useShopStore()
+
+onMounted(() => {
+  shopStore.fetchShops()
+})
+
+const shops = computed(() => shopStore.shops)
 </script>
